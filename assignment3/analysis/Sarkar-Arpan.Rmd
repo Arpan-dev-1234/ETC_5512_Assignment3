@@ -1,0 +1,348 @@
+---
+title: "Data deidentification and modification"
+subtitle: ETC5512 Assignment 3, Master of Business Analytics
+author: Prepared by Arpan Sarkar, 32559844, asar0035@student.monash.edu
+date: '`r Sys.Date()`'
+output: 
+  bookdown::html_document2:
+    self_contained: no
+    toc: yes
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    fig_caption: yes
+    fig_height: 5
+    fig_width: 8  
+    css: monashreport.css
+    includes:
+      before_body: header.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      messages = FALSE, 
+                      warning = FALSE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+library(naniar)
+library(stringr)
+library(kableExtra)
+library(haven)
+library(readxl)
+```
+
+# 🔍 Analysis
+
+## Identify and remove the **direct identifiers** from the data.
+
+```{r read}
+survey<-readRDS(here::here("raw_data","survey_data.rds"))
+survey%>% head(10)%>%kbl(table.attr="style='width:40%;'") %>%
+  kable_paper("hover",full_width = T,html_font = "Cambria", position= "left" )%>%
+  scroll_box(width = "800px", height = "400px")
+
+survey<-survey%>%select(-c(IPAddress,StartDate,EndDate,ResponseID,ResponseFirstName,ResponseLastName,LocationLatitude,LocationLongitude,QID28,RecordedDate,Finished))
+
+```
+
+Firstly I read the content of the raw data to understand the requirement of de-identification. The following direct identifiers present in the data-set are removed:
+
+**IPAddress**,**StartDate**,**EndDate**,**ResponseID**,**ResponseFirstName**,
+**ResponseLastName**,**LocationLatitude**,**LocationLongitude**,**QID28**,**RecordedDate**,**Finished**,**id_number**
+
+- **IPAddress, QID28(Email address), LocationLatitude, LocationLongitude** these variables are very specific to respondents and can cause potential risk of identification.
+
+
+- **ResponseID, ResponseFirstName, ResponseLastName and Id_number** these variables are related to personal identification and are strictly prohibited for public usage as open data. Data pertaining to these variables cannot be provided in open data. Id_number does not contain any individual’s personal information but can act as a unique identifier of rows in a data set and or can uniquely identify an individual i.e. the respondent; hence it increases the risk of identification. 
+
+- **StartDate, EndDate and RecordedDate** these variables make it easy for the respondents to filter data of specific day / date, which may cause potential risk of identification and furthermore these variables don’t have much utility in terms of analysis, as because this kind of survey is conducted every year. However it will be effective if we take the year out from the date fields and then include in the open data.
+
+- **"Finshed"** this variable increases the risk of identification if there is a minor population with unfinished/finished status. So it is logical to remove this variable and instead keep **"Progress"** variable, since people would not have the exact idea about how much they have completed. 
+
+
+
+
+```{r rename}
+survey<-plyr:: rename(survey,c("QID15"="post_code","QID6"="Age","QID7"="HouseHold_Adult_Members","QID8"="Children","QID19"=2021,"QID21"=2020,"QID22"=2019,"QID12"="WFM_status_2019","QID10"="WFM_status_2020","QID14"="Working_Hours_2019","QID16"="Working_Hours_2020","QID17_1"="Traditional_work_hours_2019","QID17_2"="Early_mornings_2019","QID17_3"="Early_evenings_2019","QID17_4"="Late_evenings_2019","QID17_5"="Overnight_2019", "QID18_1"="Traditional_work_hours_2020","QID18_2"="Early_mornings_2020","QID18_3"="Early_evenings_2020","QID18_4"="Late_evenings_2020","QID18_5"="Overnight_2020", "QID20"="Work_sch_stab_2019","QID23"="Work_sch_stab_2020","QID24_1"="Comfortable_2019", "QID24_2"="Lonely_2019","QID24_3"="Active_2019","QID24_4"="Connected_2019","QID24_5"="Peaceful_2019","QID24_6"="Chaotic_2019", "QID25_1"="Comfortable_2020", "QID25_2"="Lonely_2020","QID25_3"="Active_2020","QID25_4"="Connected_2020","QID25_5"="Peaceful_2020","QID25_6"="Chaotic_2020","QID26"="Mental_Health_2019","QID27"="Mental_Health_2020","QID29"="sampler_consent" ))
+
+survey$post_code<- as.character(survey$post_code)
+```
+
+- For better understanding after removing direct identifiers, I have replaced the column names with better form of abbreviated names using the questioner and used underscores between words.
+
+
+
+
+## De-identification strategy
+
+```{r join}
+
+postcodes<-read_excel(here::here("data","LocalityFinder.xlsx "), sheet = 1, range = "A3:H3948")
+
+postcodes<-clean_names(postcodes)
+
+postcodes$post_code<- as.character(postcodes$post_code)
+
+postcodes<-postcodes%>%select(c("post_code", "region_name"))
+  
+survey1<- left_join(survey,postcodes, by = c("post_code"))
+survey1<- survey1[!duplicated(survey1$id_number), ]
+
+survey1<- survey1%>% select(-id_number)
+
+
+```
+
+**Post Code Data**
+
+- In the survey data, respondents have provided their postcodes and now as the survey was taken in Victoria the range of post codes is between **3000—3999**.
+
+- There is a huge risk of getting identified if there is only one respondent from a particular zip code. So it would be better if we aggregate the zip codes into certain regions or areas. For doing that I have used left join with the data **LocalityFinder.xlsx** and kept the **region names** instead of **post code** in the dataset.
+
+**Data Reference**
+https://discover.data.vic.gov.au/dataset/victorian-electors-by-locality-postcode-and-electorates
+
+
+
+```{r sample}
+
+sample_data<-sample_n(survey1, 100, replace = T)%>%select(-post_code)
+
+sample1<-sample_data%>% pivot_longer(cols = c("2019":"2021"),names_to = "Year", values_to = "Income")
+
+sample1$Income<- round( as.numeric(sample1$Income))
+
+```
+
+**Income Data**
+
+- To modify the data I have taken a sample of 100 randomly chosen data from the data-set.This makes data more generalized and reduces the risk of identification.
+
+-	In the sample data I have created one Income column by transforming it to pivot longer as highlighted in the above code chunk. This process increases the utility of the data as a whole.
+
+
+```{r incnoise}
+sample1<- sample1 %>%
+  mutate(new_income = round( Income + rnorm(n(),0,10000)))%>%
+ select(!Income) 
+```
+
+- In the next step I have noticed that the income data are very specific to the respondents and respondents can easily be identified with a closer look at these data. 
+
+- So one option is to remove the income column altogether. But it will reduce the utility of the data as a whole. So its logical to add some noise in the data at low - medium incomes, but not at higher incomes.
+
+
+```{r tob&bottom}
+sample1 <- sample1 %>%
+ mutate(Income = case_when(new_income>=197790 ~ 197790,new_income!=197790~new_income))%>%
+  mutate(Duration= round(Duration))
+
+sample1%>%select(-new_income)%>%head(10)
+
+sample1<-sample1%>%select(-new_income)
+
+```
+
+
+- Noise at low - medium incomes is introduced but not in higher income values. Now it will be better if we censor the values of the distribution with particular set of incomes to reduce the risk of identification of rare values and same is true for low income values as well.
+
+- The above code chunk is used for data with top and bottom values.
+
+**Duration**
+
+- Also in the same code chunk I have rounded the Duration column as the values were recorded in seconds with figures of milliseconds and less after decimal which can act as a unique identifier for the respondent in the data-set and can increase identification risk. 
+
+
+```{r ranging}
+sample1 <- sample1 %>%
+ mutate(HouseHold_Adult_Members =ifelse(HouseHold_Adult_Members>=4,"4-5",HouseHold_Adult_Members))
+
+
+sample1 <- sample1 %>%
+ mutate(Children =ifelse(Children>=4,"4-5",Children))
+
+sample1<- sample1 %>%
+  mutate(age_group = as.factor(cut(Age,breaks = c(18,40,60,100))))%>%select(-c(Age))
+```
+
+**House Hold Adult Members, Children**
+
+- In the data-set we have variables like “HouseHold_Adult_Members”, “Children”, that is showing the count of adult members and children in the family.
+
+- In these variables the max value would be a rare case scenario so it is better to group those values in a specific range and for that I have created a range of 4-5 for 4 and 5 counts of children and adult.
+
+**Age**
+
+- In the data-set age variable is very specific to some persons and can be easily identifiable, I have combined the information into categories with multiple individuals per cell.
+
+
+
+
+
+
+```{r Q1}
+
+ sample1<-sample1%>% pivot_longer(cols = c("WFM_status_2019":"WFM_status_2020"),names_to =  "wfh_status_Year", values_to = "wfh_response")%>%mutate(wfh_status_Year= case_when(wfh_status_Year== "WFM_status_2019"~2019,wfh_status_Year== "WFM_status_2020"~2020))
+ 
+ sample1<-sample1%>% pivot_longer(cols = c("Working_Hours_2019":"Working_Hours_2020"),names_to =  "avg_Week_wrk_hrs_year", values_to = "avg_Week_wrk_hrs_responses")%>%mutate(avg_Week_wrk_hrs_year= case_when(avg_Week_wrk_hrs_year== "Working_Hours_2019"~2019,avg_Week_wrk_hrs_year== "Working_Hours_2020"~2020))
+```
+
+**QID10, QID12,QID14,QID16**
+
+
+- In the original dataset QID10 and QID12 are same Question variables but for years 2020 and 2019 respectively. 
+
+- I have used pivot longer to keep the year value in “wfh_status_Year”, and their responses in "wfh_status". 
+
+
+- Similarly for QID14 and QID16 I used Pivot longer to keep the year variable in “Avg_Week_wrk_hrs_year” and responses in “Avg_Week_wrk_hrs_stat”.
+
+
+```{r Q2}
+sample1<-sample1%>% pivot_longer(cols = c("Mental_Health_2019":"Mental_Health_2020"),names_to =  "mental_hlth_year", values_to = "mental_helth_response")%>%mutate(mental_hlth_year= case_when(mental_hlth_year== "Mental_Health_2019"~2019,mental_hlth_year== "Mental_Health_2020"~2020)) 
+
+sample1<-sample1%>% pivot_longer(cols = c("Work_sch_stab_2019":"Work_sch_stab_2020"),names_to =  "work_sch_stab_year", values_to = "work_sch_stab_response")%>%mutate(work_sch_stab_year= case_when(work_sch_stab_year== "Work_sch_stab_2019"~2019,work_sch_stab_year== "Work_sch_stab_2020"~2020))
+``` 
+
+**QID20, QID23, QID26, QID27**
+ 
+- Similar to the previous chunk I have to perform the same steps to put the variables in long format for **QID20, QID23, QID26 & QID27**.
+
+- So in the above chunk I followed the same process to do it.
+ 
+ 
+ 
+ 
+ 
+```{r Q3} 
+sample1<-sample1%>% pivot_longer(cols = c("Traditional_work_hours_2019":"Overnight_2020"),names_to =  "work_sch_item", values_to = "work_sch_response")
+
+sample1<-sample1%>%mutate(work_sch_year= case_when(str_detect(sample1$work_sch_item,"2019")~2019,str_detect(sample1$work_sch_item,"2020")~2020))
+
+sample1$work_sch_item<-gsub("_2019","",as.character(sample1$work_sch_item))
+sample1$work_sch_item<-gsub("_2020","",as.character(sample1$work_sch_item))
+ 
+ 
+sample1<-sample1%>% pivot_longer(cols = c("Comfortable_2019":"Chaotic_2020"),names_to =  "home_life_item", values_to = "home_life_response")
+  
+sample1<-sample1%>%mutate(home_life_year= case_when(str_detect(sample1$home_life_item,"2019")~2019,str_detect(sample1$home_life_item,"2020")~2020))
+ 
+sample1$home_life_item<-gsub("_2019","",as.character(sample1$home_life_item))
+sample1$home_life_item<-gsub("_2020","",as.character(sample1$home_life_item))
+
+```
+
+**QID1, QID18, QID24, QID25**
+
+- In the original survey data for questionnaire, **QID17 & QID18(replaced names: “work_sch_year”, “work_sch_response”, "work_sch_item")** and **QID24 & QID25(replaced names: “home_life_year”, “home_life_stat”,"home_life_item")** was in wide format with each option as a variable**(example: QID17_1,QID17_2,QID17_3 etc.)**.
+
+- So I have converted them into long format as shown in the above chunk.
+
+- This action has increased the utility of the data set and will be easier to process as computer readable structure.
+
+
+## Check strategy
+
+**checking utility of region name**
+
+```{r check-1}
+
+
+survey1%>%select(region_name,post_code)%>% group_by(region_name)%>%na.omit()%>%head(20)%>%kable()
+```
+- In the above data frame I can observe that one region has more than one post codes, which in a way helping me in reducing the risk of identification.
+
+
+
+**Top coding significance check**
+
+```{r check-2}
+sample1%>%select(region_name,Income)%>%group_by(Income)%>%arrange(-Income)%>%na.omit()%>% head(10)%>%kable()
+```
+
+
+**As I have top coded the high income values in de-identification strategy let's check if it's effective or not.**
+
+- From the above table I can observe the high income values are converted into one generalised value and that’s why it is reducing the risk of identification.
+
+
+```{r check-3}
+sample1%>%select(region_name,Income,age_group,HouseHold_Adult_Members,Children)%>%group_by(region_name,Income,age_group,HouseHold_Adult_Members,Children)%>%
+  mutate(Freq = n()) %>%ungroup() %>%
+  filter(Freq == 1 )
+```
+- So we don’t have any unique identifiers in the data-set which reveals that I have achieved the target of de-identification of data for use as open source data set.
+
+
+## Computer readable structure
+
+**Column names readable structure**
+
+The names of the columns are **`r names(sample1)`**
+
+```{r}
+sample1%>%arrange(-Income)%>%head(10)%>%kbl(table.attr="style='width:70%;'") %>%
+  kable_paper("hover",full_width = T,html_font = "Cambria", position= "left" )%>%
+  scroll_box(width = "800px", height = "400px")
+```
+
+
+**Data Summary Of Missing Values**
+
+```{r}
+miss_var_summary(sample1)%>%kbl(table.attr="style='width:40%;'") %>%
+  kable_paper("hover",full_width = T,html_font = "Cambria", position= "left" )%>%
+  scroll_box(width = "800px", height = "400px")
+```
+
+
+
+
+## Save data in a csv form in the data folder
+
+```{r}
+write.csv(sample1, file = "D:/R_Projects/5512_Assignment_3/assignment3_template/data/release-data-Sarkar-Arpan.csv")
+```
+
+
+## Resources
+
+**Data Sources**
+
+[1] Kennedy L.A., (2021) Simulated Data Survey.
+
+[2] https://discover.data.vic.gov.au/dataset/victorian-electors-by-locality-postcode-and-electorates
+
+
+**References**
+
+[1] Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
+  4(43), 1686, https://doi.org/10.21105/joss.01686
+  
+[2] Kirill Müller (2020). here: A Simpler Way to Find Your Files. R package version
+  1.0.1. https://CRAN.R-project.org/package=here
+  
+[3] Sam Firke (2021). janitor: Simple Tools for Examining and Cleaning Dirty Data. R
+  package version 2.1.0. https://CRAN.R-project.org/package=janitor
+  
+[4] Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate.
+  Journal of Statistical Software, 40(3), 1-25. URL https://www.jstatsoft.org/v40/i03/.
+  
+[5] Nicholas Tierney, Di Cook, Miles McBain and Colin Fay (2020). naniar: Data
+  Structures, Summaries, and Visualisations for Missing Data. R package version 0.6.0.
+  https://CRAN.R-project.org/package=naniar 
+
+[6] Hadley Wickham (2019). stringr: Simple, Consistent Wrappers for Common String
+  Operations. R package version 1.4.0. https://CRAN.R-project.org/package=stringr
+  
+[7] Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R
+  package version 1.3.4. https://CRAN.R-project.org/package=kableExtra 
+
+[8] Hadley Wickham and Evan Miller (2020). haven: Import and Export 'SPSS', 'Stata' and
+  'SAS' Files. R package version 2.3.1. https://CRAN.R-project.org/package=haven
+  
+[9] Hadley Wickham and Jennifer Bryan (2019). readxl: Read Excel Files. R package version
+  1.3.1. https://CRAN.R-project.org/package=readxl
+

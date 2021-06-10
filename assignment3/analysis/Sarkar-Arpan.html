@@ -1,0 +1,3636 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Prepared by Arpan Sarkar, 32559844, asar0035@student.monash.edu" />
+
+<meta name="date" content="2021-06-04" />
+
+<title>Data deidentification and modification</title>
+
+<script src="Sarkar-Arpan_files/header-attrs-2.7/header-attrs.js"></script>
+<script src="Sarkar-Arpan_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Sarkar-Arpan_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Sarkar-Arpan_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Sarkar-Arpan_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Sarkar-Arpan_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="Sarkar-Arpan_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="Sarkar-Arpan_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="Sarkar-Arpan_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="Sarkar-Arpan_files/navigation-1.1/tabsets.js"></script>
+<link href="Sarkar-Arpan_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="Sarkar-Arpan_files/highlightjs-9.12.0/highlight.js"></script>
+<script src="Sarkar-Arpan_files/kePrint-0.0.1/kePrint.js"></script>
+<link href="Sarkar-Arpan_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="monashreport.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
+
+
+
+<img src="header.png">
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Data deidentification and modification</h1>
+<h3 class="subtitle">ETC5512 Assignment 3, Master of Business Analytics</h3>
+<h4 class="author">Prepared by Arpan Sarkar, 32559844, <a href="mailto:asar0035@student.monash.edu" class="email">asar0035@student.monash.edu</a></h4>
+<h4 class="date">2021-06-04</h4>
+
+</div>
+
+
+<div id="analysis" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> 🔍 Analysis</h1>
+<div id="identify-and-remove-the-direct-identifiers-from-the-data." class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Identify and remove the <strong>direct identifiers</strong> from the data.</h2>
+<pre class="r"><code>survey&lt;-readRDS(here::here(&quot;raw_data&quot;,&quot;survey_data.rds&quot;))
+survey%&gt;% head(10)%&gt;%kbl(table.attr=&quot;style=&#39;width:40%;&#39;&quot;) %&gt;%
+  kable_paper(&quot;hover&quot;,full_width = T,html_font = &quot;Cambria&quot;, position= &quot;left&quot; )%&gt;%
+  scroll_box(width = &quot;800px&quot;, height = &quot;400px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:800px; ">
+<table style="width:40%; font-family: Cambria; " class=" lightable-paper lightable-hover">
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+id_number
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+StartDate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Finished
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+IPAddress
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Progress
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Duration
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+EndDate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+RecordedDate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+ResponseID
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+ResponseLastName
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+ResponseFirstName
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+LocationLatitude
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+LocationLongitude
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID29
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID6
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID7
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID8
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID15
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID22
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID21
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID19
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID12
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID10
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID14
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID16
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID17_1
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID17_2
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID17_3
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID17_4
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID17_5
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID18_1
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID18_2
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID18_3
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID18_4
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID18_5
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID20
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID23
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID24_1
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID24_2
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID24_3
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID24_4
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID24_5
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID24_6
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID25_1
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID25_2
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID25_3
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID25_4
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID25_5
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID25_6
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID26
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+QID27
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+QID28
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+2021-01-30
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+50.43.179.2
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+1588.3878
+</td>
+<td style="text-align:left;">
+2021-01-30
+</td>
+<td style="text-align:left;">
+2021-01-30
+</td>
+<td style="text-align:left;">
+R_TYmq3BncbVCB4uas
+</td>
+<td style="text-align:left;">
+Butler
+</td>
+<td style="text-align:left;">
+Hakeema
+</td>
+<td style="text-align:right;">
+-38.73768
+</td>
+<td style="text-align:right;">
+144.0660
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3186
+</td>
+<td style="text-align:right;">
+107512.69
+</td>
+<td style="text-align:right;">
+122311.49
+</td>
+<td style="text-align:right;">
+118999.41
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+<a href="mailto:Hakeema.Butler89@yahoo" class="email">Hakeema.Butler89@yahoo</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+2021-01-22
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+99.225.66.158
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+1117.5621
+</td>
+<td style="text-align:left;">
+2021-01-22
+</td>
+<td style="text-align:left;">
+2021-01-22
+</td>
+<td style="text-align:left;">
+R_IgGYrvKoYMaYxsrr
+</td>
+<td style="text-align:left;">
+Contreras
+</td>
+<td style="text-align:left;">
+Forrest
+</td>
+<td style="text-align:right;">
+-37.31527
+</td>
+<td style="text-align:right;">
+145.6965
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+68
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3049
+</td>
+<td style="text-align:right;">
+75550.19
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+100405.64
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+<a href="mailto:Forrest.Contreras860@hotmail" class="email">Forrest.Contreras860@hotmail</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+2021-01-12
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+72.81.19.192
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+372.0479
+</td>
+<td style="text-align:left;">
+2021-01-12
+</td>
+<td style="text-align:left;">
+2021-01-12
+</td>
+<td style="text-align:left;">
+R_bPLcOsBGogQjAo6J
+</td>
+<td style="text-align:left;">
+el-Hallal
+</td>
+<td style="text-align:left;">
+Michael
+</td>
+<td style="text-align:right;">
+-38.33394
+</td>
+<td style="text-align:right;">
+143.8086
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3201
+</td>
+<td style="text-align:right;">
+88755.34
+</td>
+<td style="text-align:right;">
+100283.91
+</td>
+<td style="text-align:right;">
+97700.49
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+<a href="mailto:Michael.el-Hallal57@gmail" class="email">Michael.el-Hallal57@gmail</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+2021-01-10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+82.136.191.205
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+100.5913
+</td>
+<td style="text-align:left;">
+2021-01-10
+</td>
+<td style="text-align:left;">
+2021-01-10
+</td>
+<td style="text-align:left;">
+R_WHCSTVoFusmXNNOi
+</td>
+<td style="text-align:left;">
+Villegas
+</td>
+<td style="text-align:left;">
+Mamoon
+</td>
+<td style="text-align:right;">
+-37.92232
+</td>
+<td style="text-align:right;">
+144.7996
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3068
+</td>
+<td style="text-align:right;">
+271736.36
+</td>
+<td style="text-align:right;">
+295452.91
+</td>
+<td style="text-align:right;">
+292357.52
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+<a href="mailto:Mamoon.Villegas242@yahoo" class="email">Mamoon.Villegas242@yahoo</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+2021-01-09
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+112.69.144.8
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+874.8889
+</td>
+<td style="text-align:left;">
+2021-01-09
+</td>
+<td style="text-align:left;">
+2021-01-09
+</td>
+<td style="text-align:left;">
+R_IekGZllebcmSfyXJ
+</td>
+<td style="text-align:left;">
+al-Faraj
+</td>
+<td style="text-align:left;">
+Elija
+</td>
+<td style="text-align:right;">
+-37.86955
+</td>
+<td style="text-align:right;">
+143.1104
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3119
+</td>
+<td style="text-align:right;">
+172966.94
+</td>
+<td style="text-align:right;">
+189771.73
+</td>
+<td style="text-align:right;">
+195586.28
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+<a href="mailto:Elija.al-Faraj367@hotmail" class="email">Elija.al-Faraj367@hotmail</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+2021-01-03
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+76.142.189.53
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+4367.4938
+</td>
+<td style="text-align:left;">
+2021-01-04
+</td>
+<td style="text-align:left;">
+2021-01-04
+</td>
+<td style="text-align:left;">
+R_sq25LrIcV4FAKxBN
+</td>
+<td style="text-align:left;">
+Quan
+</td>
+<td style="text-align:left;">
+David
+</td>
+<td style="text-align:right;">
+-37.92553
+</td>
+<td style="text-align:right;">
+144.8730
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+70
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3139
+</td>
+<td style="text-align:right;">
+115480.48
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+130480.92
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+<a href="mailto:David.Quan822@gmail" class="email">David.Quan822@gmail</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+2021-01-02
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+10.143.194.27
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+878.4513
+</td>
+<td style="text-align:left;">
+2021-01-02
+</td>
+<td style="text-align:left;">
+2021-01-02
+</td>
+<td style="text-align:left;">
+R_XWapMYz7E6f3cKzy
+</td>
+<td style="text-align:left;">
+Fuino
+</td>
+<td style="text-align:left;">
+Shadhaa
+</td>
+<td style="text-align:right;">
+-38.06055
+</td>
+<td style="text-align:right;">
+145.8709
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3159
+</td>
+<td style="text-align:right;">
+73764.08
+</td>
+<td style="text-align:right;">
+84625.35
+</td>
+<td style="text-align:right;">
+86590.45
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+<a href="mailto:Shadhaa.Fuino254@yahoo" class="email">Shadhaa.Fuino254@yahoo</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+2021-01-06
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+9.4.186.154
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+334.8779
+</td>
+<td style="text-align:left;">
+2021-01-06
+</td>
+<td style="text-align:left;">
+2021-01-06
+</td>
+<td style="text-align:left;">
+R_B9ZozohIjLMhXeWb
+</td>
+<td style="text-align:left;">
+Munoz
+</td>
+<td style="text-align:left;">
+Marlene
+</td>
+<td style="text-align:right;">
+-38.00295
+</td>
+<td style="text-align:right;">
+144.6788
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3140
+</td>
+<td style="text-align:right;">
+103770.17
+</td>
+<td style="text-align:right;">
+122131.38
+</td>
+<td style="text-align:right;">
+112780.84
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+<a href="mailto:Marlene.Munoz943@hotmail" class="email">Marlene.Munoz943@hotmail</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+2021-01-27
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+54.100.41.168
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+687.8457
+</td>
+<td style="text-align:left;">
+2021-01-27
+</td>
+<td style="text-align:left;">
+2021-01-27
+</td>
+<td style="text-align:left;">
+R_7zLYd3cGHK31USnZ
+</td>
+<td style="text-align:left;">
+Ensor
+</td>
+<td style="text-align:left;">
+Christophe
+</td>
+<td style="text-align:right;">
+-37.76183
+</td>
+<td style="text-align:right;">
+145.8919
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3106
+</td>
+<td style="text-align:right;">
+79714.92
+</td>
+<td style="text-align:right;">
+102710.16
+</td>
+<td style="text-align:right;">
+93689.04
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+<a href="mailto:Christophe.Ensor669@gmail" class="email">Christophe.Ensor669@gmail</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+2021-01-24
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+117.11.105.35
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+283.5774
+</td>
+<td style="text-align:left;">
+2021-01-24
+</td>
+<td style="text-align:left;">
+2021-01-24
+</td>
+<td style="text-align:left;">
+R_Bw8jNkMxi52R5uIq
+</td>
+<td style="text-align:left;">
+Archuleta
+</td>
+<td style="text-align:left;">
+Enrique
+</td>
+<td style="text-align:right;">
+-38.53593
+</td>
+<td style="text-align:right;">
+146.6299
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+61
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3055
+</td>
+<td style="text-align:right;">
+161119.28
+</td>
+<td style="text-align:right;">
+178007.34
+</td>
+<td style="text-align:right;">
+176675.53
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+<a href="mailto:Enrique.Archuleta900@yahoo" class="email">Enrique.Archuleta900@yahoo</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="r"><code>survey&lt;-survey%&gt;%select(-c(IPAddress,StartDate,EndDate,ResponseID,ResponseFirstName,ResponseLastName,LocationLatitude,LocationLongitude,QID28,RecordedDate,Finished))</code></pre>
+<p>Firstly I read the content of the raw data to understand the requirement of de-identification. The following direct identifiers present in the data-set are removed:</p>
+<p><strong>IPAddress</strong>,<strong>StartDate</strong>,<strong>EndDate</strong>,<strong>ResponseID</strong>,<strong>ResponseFirstName</strong>,
+<strong>ResponseLastName</strong>,<strong>LocationLatitude</strong>,<strong>LocationLongitude</strong>,<strong>QID28</strong>,<strong>RecordedDate</strong>,<strong>Finished</strong>,<strong>id_number</strong></p>
+<ul>
+<li><p><strong>IPAddress, QID28(Email address), LocationLatitude, LocationLongitude</strong> these variables are very specific to respondents and can cause potential risk of identification.</p></li>
+<li><p><strong>ResponseID, ResponseFirstName, ResponseLastName and Id_number</strong> these variables are related to personal identification and are strictly prohibited for public usage as open data. Data pertaining to these variables cannot be provided in open data. Id_number does not contain any individual’s personal information but can act as a unique identifier of rows in a data set and or can uniquely identify an individual i.e. the respondent; hence it increases the risk of identification.</p></li>
+<li><p><strong>StartDate, EndDate and RecordedDate</strong> these variables make it easy for the respondents to filter data of specific day / date, which may cause potential risk of identification and furthermore these variables don’t have much utility in terms of analysis, as because this kind of survey is conducted every year. However it will be effective if we take the year out from the date fields and then include in the open data.</p></li>
+<li><p><strong>“Finshed”</strong> this variable increases the risk of identification if there is a minor population with unfinished/finished status. So it is logical to remove this variable and instead keep <strong>“Progress”</strong> variable, since people would not have the exact idea about how much they have completed.</p></li>
+</ul>
+<pre class="r"><code>survey&lt;-plyr:: rename(survey,c(&quot;QID15&quot;=&quot;post_code&quot;,&quot;QID6&quot;=&quot;Age&quot;,&quot;QID7&quot;=&quot;HouseHold_Adult_Members&quot;,&quot;QID8&quot;=&quot;Children&quot;,&quot;QID19&quot;=2021,&quot;QID21&quot;=2020,&quot;QID22&quot;=2019,&quot;QID12&quot;=&quot;WFM_status_2019&quot;,&quot;QID10&quot;=&quot;WFM_status_2020&quot;,&quot;QID14&quot;=&quot;Working_Hours_2019&quot;,&quot;QID16&quot;=&quot;Working_Hours_2020&quot;,&quot;QID17_1&quot;=&quot;Traditional_work_hours_2019&quot;,&quot;QID17_2&quot;=&quot;Early_mornings_2019&quot;,&quot;QID17_3&quot;=&quot;Early_evenings_2019&quot;,&quot;QID17_4&quot;=&quot;Late_evenings_2019&quot;,&quot;QID17_5&quot;=&quot;Overnight_2019&quot;, &quot;QID18_1&quot;=&quot;Traditional_work_hours_2020&quot;,&quot;QID18_2&quot;=&quot;Early_mornings_2020&quot;,&quot;QID18_3&quot;=&quot;Early_evenings_2020&quot;,&quot;QID18_4&quot;=&quot;Late_evenings_2020&quot;,&quot;QID18_5&quot;=&quot;Overnight_2020&quot;, &quot;QID20&quot;=&quot;Work_sch_stab_2019&quot;,&quot;QID23&quot;=&quot;Work_sch_stab_2020&quot;,&quot;QID24_1&quot;=&quot;Comfortable_2019&quot;, &quot;QID24_2&quot;=&quot;Lonely_2019&quot;,&quot;QID24_3&quot;=&quot;Active_2019&quot;,&quot;QID24_4&quot;=&quot;Connected_2019&quot;,&quot;QID24_5&quot;=&quot;Peaceful_2019&quot;,&quot;QID24_6&quot;=&quot;Chaotic_2019&quot;, &quot;QID25_1&quot;=&quot;Comfortable_2020&quot;, &quot;QID25_2&quot;=&quot;Lonely_2020&quot;,&quot;QID25_3&quot;=&quot;Active_2020&quot;,&quot;QID25_4&quot;=&quot;Connected_2020&quot;,&quot;QID25_5&quot;=&quot;Peaceful_2020&quot;,&quot;QID25_6&quot;=&quot;Chaotic_2020&quot;,&quot;QID26&quot;=&quot;Mental_Health_2019&quot;,&quot;QID27&quot;=&quot;Mental_Health_2020&quot;,&quot;QID29&quot;=&quot;sampler_consent&quot; ))
+
+survey$post_code&lt;- as.character(survey$post_code)</code></pre>
+<ul>
+<li>For better understanding after removing direct identifiers, I have replaced the column names with better form of abbreviated names using the questioner and used underscores between words.</li>
+</ul>
+</div>
+<div id="de-identification-strategy" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> De-identification strategy</h2>
+<pre class="r"><code>postcodes&lt;-read_excel(here::here(&quot;data&quot;,&quot;LocalityFinder.xlsx &quot;), sheet = 1, range = &quot;A3:H3948&quot;)
+
+postcodes&lt;-clean_names(postcodes)
+
+postcodes$post_code&lt;- as.character(postcodes$post_code)
+
+postcodes&lt;-postcodes%&gt;%select(c(&quot;post_code&quot;, &quot;region_name&quot;))
+  
+survey1&lt;- left_join(survey,postcodes, by = c(&quot;post_code&quot;))
+survey1&lt;- survey1[!duplicated(survey1$id_number), ]
+
+survey1&lt;- survey1%&gt;% select(-id_number)</code></pre>
+<p><strong>Post Code Data</strong></p>
+<ul>
+<li><p>In the survey data, respondents have provided their postcodes and now as the survey was taken in Victoria the range of post codes is between <strong>3000—3999</strong>.</p></li>
+<li><p>There is a huge risk of getting identified if there is only one respondent from a particular zip code. So it would be better if we aggregate the zip codes into certain regions or areas. For doing that I have used left join with the data <strong>LocalityFinder.xlsx</strong> and kept the <strong>region names</strong> instead of <strong>post code</strong> in the dataset.</p></li>
+</ul>
+<p><strong>Data Reference</strong>
+<a href="https://discover.data.vic.gov.au/dataset/victorian-electors-by-locality-postcode-and-electorates" class="uri">https://discover.data.vic.gov.au/dataset/victorian-electors-by-locality-postcode-and-electorates</a></p>
+<pre class="r"><code>sample_data&lt;-sample_n(survey1, 100, replace = T)%&gt;%select(-post_code)
+
+sample1&lt;-sample_data%&gt;% pivot_longer(cols = c(&quot;2019&quot;:&quot;2021&quot;),names_to = &quot;Year&quot;, values_to = &quot;Income&quot;)
+
+sample1$Income&lt;- round( as.numeric(sample1$Income))</code></pre>
+<p><strong>Income Data</strong></p>
+<ul>
+<li><p>To modify the data I have taken a sample of 100 randomly chosen data from the data-set.This makes data more generalized and reduces the risk of identification.</p></li>
+<li><p>In the sample data I have created one Income column by transforming it to pivot longer as highlighted in the above code chunk. This process increases the utility of the data as a whole.</p></li>
+</ul>
+<pre class="r"><code>sample1&lt;- sample1 %&gt;%
+  mutate(new_income = round( Income + rnorm(n(),0,10000)))%&gt;%
+ select(!Income) </code></pre>
+<ul>
+<li><p>In the next step I have noticed that the income data are very specific to the respondents and respondents can easily be identified with a closer look at these data.</p></li>
+<li><p>So one option is to remove the income column altogether. But it will reduce the utility of the data as a whole. So its logical to add some noise in the data at low - medium incomes, but not at higher incomes.</p></li>
+</ul>
+<pre class="r"><code>sample1 &lt;- sample1 %&gt;%
+ mutate(Income = case_when(new_income&gt;=197790 ~ 197790,new_income!=197790~new_income))%&gt;%
+  mutate(Duration= round(Duration))
+
+sample1%&gt;%select(-new_income)%&gt;%head(10)</code></pre>
+<pre><code>## # A tibble: 10 x 39
+##    Progress Duration sampler_consent   Age HouseHold_Adult_Members Children
+##       &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt;                   &lt;dbl&gt;    &lt;dbl&gt;
+##  1     49.5       NA               1    63                       2        1
+##  2     49.5       NA               1    63                       2        1
+##  3     49.5       NA               1    63                       2        1
+##  4    100       2350               1    48                       1        1
+##  5    100       2350               1    48                       1        1
+##  6    100       2350               1    48                       1        1
+##  7    100        237               1    36                       3        0
+##  8    100        237               1    36                       3        0
+##  9    100        237               1    36                       3        0
+## 10    100        574               1    46                       1        1
+## # ... with 33 more variables: WFM_status_2019 &lt;int&gt;, WFM_status_2020 &lt;int&gt;,
+## #   Working_Hours_2019 &lt;int&gt;, Working_Hours_2020 &lt;dbl&gt;,
+## #   Traditional_work_hours_2019 &lt;int&gt;, Early_mornings_2019 &lt;int&gt;,
+## #   Early_evenings_2019 &lt;int&gt;, Late_evenings_2019 &lt;int&gt;, Overnight_2019 &lt;int&gt;,
+## #   Traditional_work_hours_2020 &lt;int&gt;, Early_mornings_2020 &lt;int&gt;,
+## #   Early_evenings_2020 &lt;int&gt;, Late_evenings_2020 &lt;int&gt;, Overnight_2020 &lt;int&gt;,
+## #   Work_sch_stab_2019 &lt;int&gt;, Work_sch_stab_2020 &lt;int&gt;, Comfortable_2019 &lt;int&gt;,
+## #   Lonely_2019 &lt;int&gt;, Active_2019 &lt;int&gt;, Connected_2019 &lt;int&gt;,
+## #   Peaceful_2019 &lt;int&gt;, Chaotic_2019 &lt;int&gt;, Comfortable_2020 &lt;int&gt;,
+## #   Lonely_2020 &lt;int&gt;, Active_2020 &lt;int&gt;, Connected_2020 &lt;int&gt;,
+## #   Peaceful_2020 &lt;int&gt;, Chaotic_2020 &lt;int&gt;, Mental_Health_2019 &lt;int&gt;,
+## #   Mental_Health_2020 &lt;int&gt;, region_name &lt;chr&gt;, Year &lt;chr&gt;, Income &lt;dbl&gt;</code></pre>
+<pre class="r"><code>sample1&lt;-sample1%&gt;%select(-new_income)</code></pre>
+<ul>
+<li><p>Noise at low - medium incomes is introduced but not in higher income values. Now it will be better if we censor the values of the distribution with particular set of incomes to reduce the risk of identification of rare values and same is true for low income values as well.</p></li>
+<li><p>The above code chunk is used for data with top and bottom values.</p></li>
+</ul>
+<p><strong>Duration</strong></p>
+<ul>
+<li>Also in the same code chunk I have rounded the Duration column as the values were recorded in seconds with figures of milliseconds and less after decimal which can act as a unique identifier for the respondent in the data-set and can increase identification risk.</li>
+</ul>
+<pre class="r"><code>sample1 &lt;- sample1 %&gt;%
+ mutate(HouseHold_Adult_Members =ifelse(HouseHold_Adult_Members&gt;=4,&quot;4-5&quot;,HouseHold_Adult_Members))
+
+
+sample1 &lt;- sample1 %&gt;%
+ mutate(Children =ifelse(Children&gt;=4,&quot;4-5&quot;,Children))
+
+sample1&lt;- sample1 %&gt;%
+  mutate(age_group = as.factor(cut(Age,breaks = c(18,40,60,100))))%&gt;%select(-c(Age))</code></pre>
+<p><strong>House Hold Adult Members, Children</strong></p>
+<ul>
+<li><p>In the data-set we have variables like “HouseHold_Adult_Members”, “Children”, that is showing the count of adult members and children in the family.</p></li>
+<li><p>In these variables the max value would be a rare case scenario so it is better to group those values in a specific range and for that I have created a range of 4-5 for 4 and 5 counts of children and adult.</p></li>
+</ul>
+<p><strong>Age</strong></p>
+<ul>
+<li>In the data-set age variable is very specific to some persons and can be easily identifiable, I have combined the information into categories with multiple individuals per cell.</li>
+</ul>
+<pre class="r"><code> sample1&lt;-sample1%&gt;% pivot_longer(cols = c(&quot;WFM_status_2019&quot;:&quot;WFM_status_2020&quot;),names_to =  &quot;wfh_status_Year&quot;, values_to = &quot;wfh_response&quot;)%&gt;%mutate(wfh_status_Year= case_when(wfh_status_Year== &quot;WFM_status_2019&quot;~2019,wfh_status_Year== &quot;WFM_status_2020&quot;~2020))
+ 
+ sample1&lt;-sample1%&gt;% pivot_longer(cols = c(&quot;Working_Hours_2019&quot;:&quot;Working_Hours_2020&quot;),names_to =  &quot;avg_Week_wrk_hrs_year&quot;, values_to = &quot;avg_Week_wrk_hrs_responses&quot;)%&gt;%mutate(avg_Week_wrk_hrs_year= case_when(avg_Week_wrk_hrs_year== &quot;Working_Hours_2019&quot;~2019,avg_Week_wrk_hrs_year== &quot;Working_Hours_2020&quot;~2020))</code></pre>
+<p><strong>QID10, QID12,QID14,QID16</strong></p>
+<ul>
+<li><p>In the original dataset QID10 and QID12 are same Question variables but for years 2020 and 2019 respectively.</p></li>
+<li><p>I have used pivot longer to keep the year value in “wfh_status_Year”, and their responses in “wfh_status”.</p></li>
+<li><p>Similarly for QID14 and QID16 I used Pivot longer to keep the year variable in “Avg_Week_wrk_hrs_year” and responses in “Avg_Week_wrk_hrs_stat”.</p></li>
+</ul>
+<pre class="r"><code>sample1&lt;-sample1%&gt;% pivot_longer(cols = c(&quot;Mental_Health_2019&quot;:&quot;Mental_Health_2020&quot;),names_to =  &quot;mental_hlth_year&quot;, values_to = &quot;mental_helth_response&quot;)%&gt;%mutate(mental_hlth_year= case_when(mental_hlth_year== &quot;Mental_Health_2019&quot;~2019,mental_hlth_year== &quot;Mental_Health_2020&quot;~2020)) 
+
+sample1&lt;-sample1%&gt;% pivot_longer(cols = c(&quot;Work_sch_stab_2019&quot;:&quot;Work_sch_stab_2020&quot;),names_to =  &quot;work_sch_stab_year&quot;, values_to = &quot;work_sch_stab_response&quot;)%&gt;%mutate(work_sch_stab_year= case_when(work_sch_stab_year== &quot;Work_sch_stab_2019&quot;~2019,work_sch_stab_year== &quot;Work_sch_stab_2020&quot;~2020))</code></pre>
+<p><strong>QID20, QID23, QID26, QID27</strong></p>
+<ul>
+<li><p>Similar to the previous chunk I have to perform the same steps to put the variables in long format for <strong>QID20, QID23, QID26 &amp; QID27</strong>.</p></li>
+<li><p>So in the above chunk I followed the same process to do it.</p></li>
+</ul>
+<pre class="r"><code>sample1&lt;-sample1%&gt;% pivot_longer(cols = c(&quot;Traditional_work_hours_2019&quot;:&quot;Overnight_2020&quot;),names_to =  &quot;work_sch_item&quot;, values_to = &quot;work_sch_response&quot;)
+
+sample1&lt;-sample1%&gt;%mutate(work_sch_year= case_when(str_detect(sample1$work_sch_item,&quot;2019&quot;)~2019,str_detect(sample1$work_sch_item,&quot;2020&quot;)~2020))
+
+sample1$work_sch_item&lt;-gsub(&quot;_2019&quot;,&quot;&quot;,as.character(sample1$work_sch_item))
+sample1$work_sch_item&lt;-gsub(&quot;_2020&quot;,&quot;&quot;,as.character(sample1$work_sch_item))
+ 
+ 
+sample1&lt;-sample1%&gt;% pivot_longer(cols = c(&quot;Comfortable_2019&quot;:&quot;Chaotic_2020&quot;),names_to =  &quot;home_life_item&quot;, values_to = &quot;home_life_response&quot;)
+  
+sample1&lt;-sample1%&gt;%mutate(home_life_year= case_when(str_detect(sample1$home_life_item,&quot;2019&quot;)~2019,str_detect(sample1$home_life_item,&quot;2020&quot;)~2020))
+ 
+sample1$home_life_item&lt;-gsub(&quot;_2019&quot;,&quot;&quot;,as.character(sample1$home_life_item))
+sample1$home_life_item&lt;-gsub(&quot;_2020&quot;,&quot;&quot;,as.character(sample1$home_life_item))</code></pre>
+<p><strong>QID1, QID18, QID24, QID25</strong></p>
+<ul>
+<li><p>In the original survey data for questionnaire, <strong>QID17 &amp; QID18(replaced names: “work_sch_year”, “work_sch_response”, “work_sch_item”)</strong> and <strong>QID24 &amp; QID25(replaced names: “home_life_year”, “home_life_stat”,“home_life_item”)</strong> was in wide format with each option as a variable<strong>(example: QID17_1,QID17_2,QID17_3 etc.)</strong>.</p></li>
+<li><p>So I have converted them into long format as shown in the above chunk.</p></li>
+<li><p>This action has increased the utility of the data set and will be easier to process as computer readable structure.</p></li>
+</ul>
+</div>
+<div id="check-strategy" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Check strategy</h2>
+<p><strong>checking utility of region name</strong></p>
+<pre class="r"><code>survey1%&gt;%select(region_name,post_code)%&gt;% group_by(region_name)%&gt;%na.omit()%&gt;%head(20)%&gt;%kable()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+region_name
+</th>
+<th style="text-align:left;">
+post_code
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Southern Metropolitan
+</td>
+<td style="text-align:left;">
+3186
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Metropolitan
+</td>
+<td style="text-align:left;">
+3049
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+South-Eastern Metropolitan
+</td>
+<td style="text-align:left;">
+3201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Metropolitan
+</td>
+<td style="text-align:left;">
+3068
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Victoria
+</td>
+<td style="text-align:left;">
+3139
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eastern Victoria
+</td>
+<td style="text-align:left;">
+3159
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eastern Victoria
+</td>
+<td style="text-align:left;">
+3140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eastern Metropolitan
+</td>
+<td style="text-align:left;">
+3106
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Metropolitan
+</td>
+<td style="text-align:left;">
+3055
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Metropolitan
+</td>
+<td style="text-align:left;">
+3048
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Metropolitan
+</td>
+<td style="text-align:left;">
+3044
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Southern Metropolitan
+</td>
+<td style="text-align:left;">
+3205
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:left;">
+3023
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eastern Metropolitan
+</td>
+<td style="text-align:left;">
+3180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+South-Eastern Metropolitan
+</td>
+<td style="text-align:left;">
+3167
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Southern Metropolitan
+</td>
+<td style="text-align:left;">
+3205
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eastern Metropolitan
+</td>
+<td style="text-align:left;">
+3084
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Victoria
+</td>
+<td style="text-align:left;">
+3096
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:left;">
+3043
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Northern Metropolitan
+</td>
+<td style="text-align:left;">
+3046
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>In the above data frame I can observe that one region has more than one post codes, which in a way helping me in reducing the risk of identification.</li>
+</ul>
+<p><strong>Top coding significance check</strong></p>
+<pre class="r"><code>sample1%&gt;%select(region_name,Income)%&gt;%group_by(Income)%&gt;%arrange(-Income)%&gt;%na.omit()%&gt;% head(10)%&gt;%kable()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+region_name
+</th>
+<th style="text-align:right;">
+Income
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Western Metropolitan
+</td>
+<td style="text-align:right;">
+197790
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>As I have top coded the high income values in de-identification strategy let’s check if it’s effective or not.</strong></p>
+<ul>
+<li>From the above table I can observe the high income values are converted into one generalised value and that’s why it is reducing the risk of identification.</li>
+</ul>
+<pre class="r"><code>sample1%&gt;%select(region_name,Income,age_group,HouseHold_Adult_Members,Children)%&gt;%group_by(region_name,Income,age_group,HouseHold_Adult_Members,Children)%&gt;%
+  mutate(Freq = n()) %&gt;%ungroup() %&gt;%
+  filter(Freq == 1 )</code></pre>
+<pre><code>## # A tibble: 0 x 6
+## # ... with 6 variables: region_name &lt;chr&gt;, Income &lt;dbl&gt;, age_group &lt;fct&gt;,
+## #   HouseHold_Adult_Members &lt;chr&gt;, Children &lt;chr&gt;, Freq &lt;int&gt;</code></pre>
+<ul>
+<li>So we don’t have any unique identifiers in the data-set which reveals that I have achieved the target of de-identification of data for use as open source data set.</li>
+</ul>
+</div>
+<div id="computer-readable-structure" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Computer readable structure</h2>
+<p><strong>Column names readable structure</strong></p>
+<p>The names of the columns are <strong>Progress, Duration, sampler_consent, HouseHold_Adult_Members, Children, region_name, Year, Income, age_group, wfh_status_Year, wfh_response, avg_Week_wrk_hrs_year, avg_Week_wrk_hrs_responses, mental_hlth_year, mental_helth_response, work_sch_stab_year, work_sch_stab_response, work_sch_item, work_sch_response, work_sch_year, home_life_item, home_life_response, home_life_year</strong></p>
+<pre class="r"><code>sample1%&gt;%arrange(-Income)%&gt;%head(10)%&gt;%kbl(table.attr=&quot;style=&#39;width:70%;&#39;&quot;) %&gt;%
+  kable_paper(&quot;hover&quot;,full_width = T,html_font = &quot;Cambria&quot;, position= &quot;left&quot; )%&gt;%
+  scroll_box(width = &quot;800px&quot;, height = &quot;400px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:800px; ">
+<table style="width:70%; font-family: Cambria; " class=" lightable-paper lightable-hover">
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Progress
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Duration
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+sampler_consent
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+HouseHold_Adult_Members
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Children
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+region_name
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Year
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Income
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+age_group
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+wfh_status_Year
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+wfh_response
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+avg_Week_wrk_hrs_year
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+avg_Week_wrk_hrs_responses
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+mental_hlth_year
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+mental_helth_response
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+work_sch_stab_year
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+work_sch_stab_response
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+work_sch_item
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+work_sch_response
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+work_sch_year
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+home_life_item
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+home_life_response
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+home_life_year
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Comfortable
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2019
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Lonely
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2019
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Active
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2019
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Connected
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Peaceful
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2019
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Chaotic
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2019
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Comfortable
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2020
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Lonely
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2020
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Active
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2020
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+197790
+</td>
+<td style="text-align:left;">
+(40,60]
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Traditional_work_hours
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2019
+</td>
+<td style="text-align:left;">
+Connected
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2020
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Data Summary Of Missing Values</strong></p>
+<pre class="r"><code>miss_var_summary(sample1)%&gt;%kbl(table.attr=&quot;style=&#39;width:40%;&#39;&quot;) %&gt;%
+  kable_paper(&quot;hover&quot;,full_width = T,html_font = &quot;Cambria&quot;, position= &quot;left&quot; )%&gt;%
+  scroll_box(width = &quot;800px&quot;, height = &quot;400px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:800px; ">
+<table style="width:40%; font-family: Cambria; " class=" lightable-paper lightable-hover">
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+variable
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+n_miss
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+pct_miss
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+region_name
+</td>
+<td style="text-align:right;">
+80640
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+work_sch_stab_response
+</td>
+<td style="text-align:right;">
+80640
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+work_sch_response
+</td>
+<td style="text-align:right;">
+80640
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Duration
+</td>
+<td style="text-align:right;">
+11520
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mental_helth_response
+</td>
+<td style="text-align:right;">
+11520
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+home_life_response
+</td>
+<td style="text-align:right;">
+11520
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+avg_Week_wrk_hrs_responses
+</td>
+<td style="text-align:right;">
+5760
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Progress
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sampler_consent
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HouseHold_Adult_Members
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Children
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Income
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+age_group
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+wfh_status_Year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+wfh_response
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+avg_Week_wrk_hrs_year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mental_hlth_year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+work_sch_stab_year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+work_sch_item
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+work_sch_year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+home_life_item
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+home_life_year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="save-data-in-a-csv-form-in-the-data-folder" class="section level2" number="1.5">
+<h2><span class="header-section-number">1.5</span> Save data in a csv form in the data folder</h2>
+<pre class="r"><code>write.csv(sample1, file = &quot;D:/R_Projects/5512_Assignment_3/assignment3_template/data/release-data-Sarkar-Arpan.csv&quot;)</code></pre>
+</div>
+<div id="resources" class="section level2" number="1.6">
+<h2><span class="header-section-number">1.6</span> Resources</h2>
+<p><strong>Data Sources</strong></p>
+<p>[1] Kennedy L.A., (2021) Simulated Data Survey.</p>
+<p>[2] <a href="https://discover.data.vic.gov.au/dataset/victorian-electors-by-locality-postcode-and-electorates" class="uri">https://discover.data.vic.gov.au/dataset/victorian-electors-by-locality-postcode-and-electorates</a></p>
+<p><strong>References</strong></p>
+<p>[1] Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
+4(43), 1686, <a href="https://doi.org/10.21105/joss.01686" class="uri">https://doi.org/10.21105/joss.01686</a></p>
+<p>[2] Kirill Müller (2020). here: A Simpler Way to Find Your Files. R package version
+1.0.1. <a href="https://CRAN.R-project.org/package=here" class="uri">https://CRAN.R-project.org/package=here</a></p>
+<p>[3] Sam Firke (2021). janitor: Simple Tools for Examining and Cleaning Dirty Data. R
+package version 2.1.0. <a href="https://CRAN.R-project.org/package=janitor" class="uri">https://CRAN.R-project.org/package=janitor</a></p>
+<p>[4] Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate.
+Journal of Statistical Software, 40(3), 1-25. URL <a href="https://www.jstatsoft.org/v40/i03/" class="uri">https://www.jstatsoft.org/v40/i03/</a>.</p>
+<p>[5] Nicholas Tierney, Di Cook, Miles McBain and Colin Fay (2020). naniar: Data
+Structures, Summaries, and Visualisations for Missing Data. R package version 0.6.0.
+<a href="https://CRAN.R-project.org/package=naniar" class="uri">https://CRAN.R-project.org/package=naniar</a></p>
+<p>[6] Hadley Wickham (2019). stringr: Simple, Consistent Wrappers for Common String
+Operations. R package version 1.4.0. <a href="https://CRAN.R-project.org/package=stringr" class="uri">https://CRAN.R-project.org/package=stringr</a></p>
+<p>[7] Hao Zhu (2021). kableExtra: Construct Complex Table with ‘kable’ and Pipe Syntax. R
+package version 1.3.4. <a href="https://CRAN.R-project.org/package=kableExtra" class="uri">https://CRAN.R-project.org/package=kableExtra</a></p>
+<p>[8] Hadley Wickham and Evan Miller (2020). haven: Import and Export ‘SPSS’, ‘Stata’ and
+‘SAS’ Files. R package version 2.3.1. <a href="https://CRAN.R-project.org/package=haven" class="uri">https://CRAN.R-project.org/package=haven</a></p>
+<p>[9] Hadley Wickham and Jennifer Bryan (2019). readxl: Read Excel Files. R package version
+1.3.1. <a href="https://CRAN.R-project.org/package=readxl" class="uri">https://CRAN.R-project.org/package=readxl</a></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
